@@ -32,6 +32,7 @@ class Product(models.Model):
         verbose_name = _('product')
         verbose_name_plural = _('products')
         
+        
 class File(models.Model):
     product = models.ForeignKey('Product', verbose_name=_('product'), on_delete=models.CASCADE)
     title = models.CharField(_('title'), max_length=50)
