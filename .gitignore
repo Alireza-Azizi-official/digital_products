@@ -1,0 +1,5 @@
+venv/
+medai/
+
+**/__pychache__/
+*.pyc
