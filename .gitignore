@@ -3,3 +3,6 @@ medai/
 
 **/__pychache__/
 *.pyc
+
+dv.sqlite3
+local_setting.py
