@@ -9,7 +9,7 @@ class CategotrySerializer(serializers.ModelSerializer):
 class FileSerializer(serializers.ModelSerializer):
     class Meta:
         model = File
-        fields = ('title', 'file')
+        fields = ('id','title', 'file')
         
 class ProductSerializer(serializers.HyperlinkedModelSerializer):
     categories = CategotrySerializer(many = True)
