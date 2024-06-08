@@ -14,10 +14,7 @@ class UserManager(BaseUserManager):
         if not username:
             raise ValueError('The given username must be set')
         email = self.normalize_email(email)
-        user = self.model(phone_number=phone_number,
-                          username=username, email=email, is_staff=is_staff,
-                          is_active=True, is_superuser=is_superuser, date_joined=now,
-                          **extra_fields)
+        user = self.model(phone_number=phone_number,username=username, email=email, is_staff=is_staff,is_active=True, is_superuser=is_superuser, date_joined=now,**extra_fields)
         if not extra_fields.get('no_password'):
             user.set_password(password)
 
@@ -42,20 +39,13 @@ class UserManager(BaseUserManager):
         return self.get(**{'phone_number': phone_number})
 
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(_('username'), max_length=32, unique=True,
-                                help_text=_('Required. 30 characters or fewer starting with a letter. Letters, digits'),
-                                validators=[validators.RegexValidator(r'^[a-zA-Z0-9][a-zA-Z0-9_\.]+$', _('Enter a valid username. This value may contain only letters, numbers, underscore characters, and dots.'), 'invalid')],
-                                error_messages={'unique': _("A user with that username already exists.")})
+    username = models.CharField(_('username'), max_length=32, unique=True,help_text=_('Required. 30 characters or fewer starting with a letter. Letters, digits'),validators=[validators.RegexValidator(r'^[a-zA-Z0-9][a-zA-Z0-9_\.]+$', _('Enter a valid username. This value may contain only letters, numbers, underscore characters, and dots.'), 'invalid')],                                error_messages={'unique': _("A user with that username already exists.")})
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
     email = models.EmailField(_('email address'), unique=True, null=True, blank=True)
-    phone_number = models.BigIntegerField(_('mobile number'), unique=True, null=True, blank=True,
-                                          validators=[validators.RegexValidator(r'^989[0-3,9]\d{8}$', _('Enter a valid mobile number.'))],
-                                          error_messages={'unique': _("A user with this mobile number already exists.")})
-    is_staff = models.BooleanField(_('staff status'), default=False,
-                                   help_text=_('Designates whether the user can log into this admin site.'))
-    is_active = models.BooleanField(_('active'), default=True,
-                                    help_text=_('Designates whether this user should be treated as active. Unselect this instead of deleting accounts.'))
+    phone_number = models.BigIntegerField(_('mobile number'), unique=True, null=True, blank=True,validators=[validators.RegexValidator(r'^989[0-3,9]\d{8}$', _('Enter a valid mobile number.'))],error_messages={'unique': _("A user with this mobile number already exists.")})
+    is_staff = models.BooleanField(_('staff status'), default=False, help_text=_('Designates whether the user can log into this admin site.'))
+    is_active = models.BooleanField(_('active'), default=True, help_text=_('Designates whether this user should be treated as active. Unselect this instead of deleting accounts.'))
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
     last_seen = models.DateTimeField(_('last seen date'), null=True)
     objects = UserManager()
@@ -94,11 +84,7 @@ class UserProfile(models.Model):
     gender = models.BooleanField(_('gender'), help_text = _('female is False, male is True, null is unset'), null=True)
     province = models.ForeignKey(verbose_name=_('province'), to='province', null=True, default=1, on_delete=models.SET_DEFAULT)
     email = models.EmailField(_('email address'), blank=True)
-    phone_number = models.BigIntegerField(_('mobile number'), null=True, blank=True,
-                                          validators=[
-                                              validators.RegexValidator(r'^989[0-3,9]\d{8}$',
-                                                                        _('Enter a valid mobile number.'))
-                                          ])
+    phone_number = models.CharField(_('mobile number'), max_length=20, unique=True, null=True, blank=True, validators=[validators.RegexValidator(r'^989[0-3,9]\d{8}$', _('Enter a valid mobile number.'))])
     class Meta:
         db_table = 'user_profiles'
         verbose_name = _('profile')
@@ -120,19 +106,10 @@ class Device(models.Model):
     WEB = 1
     IOS = 2 
     ANDROID = 3
-    DEVICE_TYPE_CHOICES = (
-        (WEB, 'web'),
-        (IOS, 'ios'),
-        (ANDROID, 'android')
-    )
-    
+    DEVICE_TYPE_CHOICES = ((WEB, 'web'),(IOS, 'ios'),(ANDROID, 'android'))
     user =models.ForeignKey(User, related_name= 'devices', on_delete=models.CASCADE)
     device_uuid = models.UUIDField(_('Device UUID'), null=True)
-    notify_token = models.CharField(
-        _('Notification Token'), max_length=200, blank=True,
-        validators=[validators.RegexValidator(r'([a-z]| [A-z]| [0-9])\w+',
-                                              _('Notify token is not valid'),'invalid')])
-    
+    notify_token = models.CharField( _('Notification Token'), max_length=200, blank=True,validators=[validators.RegexValidator(r'([a-z]| [A-z]| [0-9])\w+',_('Notify token is not valid'),'invalid')])
     last_login = models.DateTimeField(_('last login date'), null= True)
     device_type = models.PositiveSmallIntegerField(choices=DEVICE_TYPE_CHOICES, default=WEB)
     device_os = models.CharField(_('device os'), max_length=20, blank=True)
