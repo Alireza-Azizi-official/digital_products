@@ -101,4 +101,75 @@ class User(AbstractBaseUser, PermissionsMixin):
         super().save(*args, **kwargs)
         
 class UserProfile(models.Model):
-    user = 
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    nick_name = models.CharField(_('nick_name'), max_length=150, blank=True)
+    avatar = models.ImageField(_('avatar'), blank=True)
+    birthday = models.DateField(_('birthday'), null=True, blank=True)
+    gender = models.NullBooleanField(_('gender'), help_text = _('female is False, male is True, null is unset'))
+    province = models.ForeignKey(verbose_name=_('province'), to='province', null=True, on_delete=models.SET_DEFAULT)
+    email = models.EmailField(_('email address'), blank=True)
+    phone_number = models.BigIntegerField(_('mobile number'), null=True, blank=True,
+                                          validators=[
+                                              validators.RegexValidator(r'^989[0-3,9]\d{8}$',
+                                                                        _('Enter a valid mobile number.'))
+                                          ])
+    class Meta:
+        db_table = 'user_profiles'
+        verbose_name = _('profile')
+        verbose_name = _('profile')
+        verbose_name_plural = _('profiles')
+        
+    @property
+    def get_first_name(self):
+        return self.user.first_name
+    
+    @property
+    def get_last_name(self):
+        return self.user.last_name
+    
+    def get_nickname(self):
+        return self.nick_name if self.nick_name else self.user.username
+    
+class Device(models.Model):
+    WEB = 1
+    IOS = 2 
+    ANDROID = 3
+    DEVICE_TYPE_CHOICES = (
+        (WEB, 'web'),
+        (IOS, 'ios'),
+        (ANDROID, 'android')
+    )
+    
+    user =models.ForeignKey(User, related_name= 'devices', on_delete=models.CASCADE)
+    device_uuid = models.UUIDField(_('Device UUID'), null=True)
+    notify_token = models.CharField(
+        _('Notification Token'), max_length=200, blank=True,
+        validators=[validators.RegexValidator(r'([a-z]| [A-z]| [0-9])\w+',
+                                              _('Notify token is not valid'),'invalid')])
+    
+    last_login = models.DateTimeField(_('last login date'), null= True)
+    device_type = models.PositiveSmallIntegerField(choices=DEVICE_TYPE_CHOICES, default=WEB)
+    device_os = models.CharField(_('device os'), max_length=20, blank=True)
+    device_model = models.CharField(_('device model'), max_length= 20, blank= True)
+    app_version = models.CharField(_('app version'), max_length= 20, blank= True)
+    created_time = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'user_devices'
+        verbos_name = _('devices')
+        verbos_name_plural = _('devices')
+        unique_together = ('user', 'device_uuid')
+        
+        
+class Province(models.Model):
+    name = models.CharField(max_length=50)
+    is_valid = models.BooleanField(default=True)
+    modified_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.name 
+        
+        
+    
+    
