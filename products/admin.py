@@ -14,11 +14,8 @@ class FileInlineAdmin(admin.StackedInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['title', 'is_enable', 'created_time', 'categories_list']
+    list_display = ['title', 'is_enable', 'created_time']
     list_filter = ['is_enable']
     search_fields = ['title']
     filter_horizontal = ['categories']
     inlines = [FileInlineAdmin]
-
-    def categories_list(self, obj):
-        return ', '.join([category.title for category in obj.categories.all()])

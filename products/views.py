@@ -7,6 +7,6 @@ from .serializers import CategotrySerializer, ProductSerializer, FileSerializer
 
 class ProductListView(APIView):
     def get(self, request):
-        products = products.object.all()
+        products = Product.objects.all()
         serializer = ProductSerializer(products, many = True)
         return Response(serializer.data)
