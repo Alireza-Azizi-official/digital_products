@@ -84,7 +84,20 @@ class UserProfile(models.Model):
     gender = models.BooleanField(_('gender'), help_text = _('female is False, male is True, null is unset'), null=True)
     province = models.ForeignKey(verbose_name=_('province'), to='province', null=True, default=1, on_delete=models.SET_DEFAULT)
     email = models.EmailField(_('email address'), blank=True)
-    phone_number = models.CharField(_('mobile number'), max_length=20, unique=True, null=True, blank=True, validators=[validators.RegexValidator(r'^989[0-3,9]\d{8}$', _('Enter a valid mobile number.'))])
+    phone_number = models.BigIntegerField(_('mobile number'), unique=True, null=True, blank=True, validators=[validators.RegexValidator(r'^989[0-3,9]\d{8}$', _('Enter a valid mobile number.'))])
+    
+    def create_user(self, username=None, phone_number=None, email=None, password=None, **extra_fields):
+        if username is None:
+            if email:
+                username = email.split('@', 1)[0]
+            if phone_number:
+                username = random.choice('qwertyuiopasdfghjklzxcvbnm') + str(phone_number)[-7:]
+                phone_number = int(phone_number) 
+            while User.objects.filter(username__startswith=str(random.randint(10, 99))):
+                username += str(random.randint(10, 99))
+
+        return self._create_user(username, phone_number, email, password, False, False, **extra_fields)
+    
     class Meta:
         db_table = 'user_profiles'
         verbose_name = _('profile')
