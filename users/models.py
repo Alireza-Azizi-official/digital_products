@@ -49,7 +49,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                                 validators=[validators.RegexValidator(r'^[a-zA-Z][a-zA-Z0-9_\.]+$ ',
                                                                       _('Enter a valid username starting with a-z.'
                                                                         'This value may contain only letters, numbers'
-                                                                        'and underscore characters.'), 'invalid'),],
+                                                                        ' and underscore characters.')),],
                                 error_messages={
                                     'unique':_("A user with that username already exists."),
                                 }
@@ -105,8 +105,8 @@ class UserProfile(models.Model):
     nick_name = models.CharField(_('nick_name'), max_length=150, blank=True)
     avatar = models.ImageField(_('avatar'), blank=True)
     birthday = models.DateField(_('birthday'), null=True, blank=True)
-    gender = models.NullBooleanField(_('gender'), help_text = _('female is False, male is True, null is unset'))
-    province = models.ForeignKey(verbose_name=_('province'), to='province', null=True, on_delete=models.SET_DEFAULT)
+    gender = models.BooleanField(_('gender'), help_text = _('female is False, male is True, null is unset'), null=True)
+    province = models.ForeignKey(verbose_name=_('province'), to='province', null=True, default=1, on_delete=models.SET_DEFAULT)
     email = models.EmailField(_('email address'), blank=True)
     phone_number = models.BigIntegerField(_('mobile number'), null=True, blank=True,
                                           validators=[
@@ -156,8 +156,8 @@ class Device(models.Model):
     
     class Meta:
         db_table = 'user_devices'
-        verbos_name = _('devices')
-        verbos_name_plural = _('devices')
+        verbose_name = _('device')
+        verbose_name_plural = _('devices')
         unique_together = ('user', 'device_uuid')
         
         
